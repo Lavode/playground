@@ -1,6 +1,7 @@
 package main
 
 import (
+	"gorm.io/gorm"
 	"testing"
 )
 
@@ -8,13 +9,24 @@ import (
 // GORM_BRANCH: master
 // TEST_DRIVERS: sqlite, mysql, postgres, sqlserver
 
+type A struct {
+	gorm.Model
+
+	BID uint `gorm:"not null"`
+	B   B
+}
+
+type B struct {
+	gorm.Model
+
+	As []A
+}
+
 func TestGORM(t *testing.T) {
-	user := User{Name: "jinzhu"}
+	m := DB.Migrator()
 
-	DB.Create(&user)
+	m.DropTable("as")
+	m.DropTable("bs")
 
-	var result User
-	if err := DB.First(&result, user.ID).Error; err != nil {
-		t.Errorf("Failed, got error: %v", err)
-	}
+	m.CreateTable(&A{})
 }
